@@ -9,6 +9,10 @@ on:
       pnpm-version:
         required: true
         type: string
+    outputs:
+      artifact-id:
+        description: The ID of the uploaded build artifact
+        value: ${{ jobs.Build.outputs.artifact-id }}
 
 concurrency:
   group: deploy
