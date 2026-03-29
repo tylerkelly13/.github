@@ -25,14 +25,14 @@ jobs:
       - name: Build package
         run: pnpm build
       - name: Generate Package
-        run: pnpm pack --pack-destination dist
+        run: pnpm pack --pack-destination artifacts
       - name: Generate checksums
         run: |
-          mkdir -p dist/checksums
-          shasum -a 256 dist/*.tgz > dist/checksums/sha256.txt
+          mkdir -p artifacts/checksums
+          shasum -a 256 artifacts/*.tgz > artifacts/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
         uses: actions/upload-artifact@v6
         with:
-          path: dist
+          path: artifacts
           if-no-files-found: error
