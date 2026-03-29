@@ -13,21 +13,21 @@ concurrency:
 
 jobs:
   Build:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-build.yml
+    uses: tylerkelly13/.github/.github/workflows/node-build.yml@main
     with:
       node-version: ${{ inputs.node-version }}
   
   Linting:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-linting.yml
+    uses: tylerkelly13/.github/.github/workflows/node-lint.yml@main
     with:
       node-version: ${{ inputs.node-version }}
 
   Formatting:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-formatting.yml
+    uses: tylerkelly13/.github/.github/workflows/node-formatting.yml@main
     with:
       node-version: ${{ inputs.node-version }}
 
   Tests:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-tests.yml
+    uses: tylerkelly13/.github/.github/workflows/node-test.yml@main
     with:
       node-version: ${{ inputs.node-version }}
