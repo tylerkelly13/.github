@@ -11,28 +11,23 @@ concurrency:
   group: deploy
   cancel-in-progress: true
 
-
 jobs:
   Build:
-    uses: ./nodejs-build.yml
+    uses: tylerkelly13/.github/.github/workflows/nodejs-build.yml
     with:
       node-version: ${{ inputs.node-version }}
   
   Linting:
-    uses: ./nodejs-linting.yml
+    uses: tylerkelly13/.github/.github/workflows/nodejs-linting.yml
     with:
       node-version: ${{ inputs.node-version }}
 
   Formatting:
-    uses: ./nodejs-formatting.yml
+    uses: tylerkelly13/.github/.github/workflows/nodejs-formatting.yml
     with:
       node-version: ${{ inputs.node-version }}
 
   Tests:
-    uses: ./nodejs-tests.yml
+    uses: tylerkelly13/.github/.github/workflows/nodejs-tests.yml
     with:
       node-version: ${{ inputs.node-version }}
-
-  Release:
-    needs: [ Build, Linting, Formatting, Tests ]
-    uses: ./release.yml

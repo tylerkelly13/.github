@@ -1,11 +1,15 @@
 on:
   workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
 
 jobs:
   Build:
     runs-on: ubuntu-latest
     steps:
-      - use: ./.github/actions/node/setup
+      - uses: tylerkelly13/.github/.github/actions/node-setup@main
         with:
           node-version: ${{ inputs.node-version }}
       - name: Check code formatting

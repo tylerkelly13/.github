@@ -1,5 +1,9 @@
 on:
   workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
 
 jobs:
   Build:
@@ -7,8 +11,8 @@ jobs:
     outputs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
-      - use: ./.github/actions/node/setup
-        with:
+      - uses: tylerkelly13/.github/.github/actions/node-setup@main
+        with: 
           node-version: ${{ inputs.node-version }}
       - name: Build package
         run: pnpm build
@@ -17,7 +21,9 @@ jobs:
       - name: Generate checksums
         run: shasum -a 256 dist/*.tgz > dist/checksums/sha256.txt
       - name: Upload artifacts
+        id: artifact-upload-step
         uses: actions/upload-artifact@v3
         with:
           path: dist
           if-no-files-found: error
+          artifact.id:
