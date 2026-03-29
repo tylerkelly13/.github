@@ -4,6 +4,10 @@ on:
       node-version:
         required: true
         type: string
+    outputs:
+      artifact-id:
+        description: The ID of the uploaded artifact
+        value: ${{ jobs.Build.outputs.artifact-id }}
 
 jobs:
   Build:
@@ -26,4 +30,3 @@ jobs:
         with:
           path: dist
           if-no-files-found: error
-          artifact.id:

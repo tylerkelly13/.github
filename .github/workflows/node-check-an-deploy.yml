@@ -14,25 +14,27 @@ concurrency:
 
 jobs:
   Build:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-build.yml@main
+    uses: tylerkelly13/.github/.github/workflows/node-build.yml@main
     with:
       node-version: ${{ inputs.node-version }}
   
   Linting:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-linting.yml@main
+    uses: tylerkelly13/.github/.github/workflows/node-lint.yml@main
     with:
       node-version: ${{ inputs.node-version }}
 
   Formatting:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-formatting.yml@main
+    uses: tylerkelly13/.github/.github/workflows/node-formatting.yml@main
     with:
       node-version: ${{ inputs.node-version }}
 
   Tests:
-    uses: tylerkelly13/.github/.github/workflows/nodejs-tests.yml@main
+    uses: tylerkelly13/.github/.github/workflows/node-test.yml@main
     with:
       node-version: ${{ inputs.node-version }}
 
   Release:
     needs: [ Build, Linting, Formatting, Tests ]
-    uses: tylerkelly13/.github/.github/workflows/release.yml@main
+    uses: tylerkelly13/.github/.github/workflows/node-gh-release.yml@main
+    with:
+      artifact-id: ${{ needs.Build.outputs.artifact-id }}
