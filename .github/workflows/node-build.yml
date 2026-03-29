@@ -27,7 +27,9 @@ jobs:
       - name: Generate Package
         run: pnpm pack --pack-destination dist
       - name: Generate checksums
-        run: shasum -a 256 dist/*.tgz > dist/checksums/sha256.txt
+        run: |
+          mkdir -p dist/checksums
+          shasum -a 256 dist/*.tgz > dist/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
         uses: actions/upload-artifact@v6
