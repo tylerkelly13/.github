@@ -1,18 +1,23 @@
 name: Node.js Setup
 description: Checkout, setup Node.js and install dependencies
 
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: true
+
 runs:
   using: "composite"
   steps:
     - name: Check out repository
       uses: actions/checkout@v6
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v5.0.0
     - name: Use Node.js ${{ inputs.node-version }}
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
-        cache: "npm"
-    - name: Setup pnpm and install dependencies
-      uses: pnpm/action-setup@v5.0.0
-      with:
-        cache: "npm"
-        run_install: true
+        cache: "pnpm"
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash

@@ -26,7 +26,7 @@ jobs:
         run: shasum -a 256 dist/*.tgz > dist/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           path: dist
           if-no-files-found: error
