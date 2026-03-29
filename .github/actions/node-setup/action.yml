@@ -5,6 +5,10 @@ inputs:
   node-version:
     description: Node.js version to use
     required: true
+  pnpm-version:
+    description: pnpm version to use
+    required: true
+    type: string
 
 runs:
   using: "composite"
@@ -13,6 +17,8 @@ runs:
       uses: actions/checkout@v6
     - name: Setup pnpm
       uses: pnpm/action-setup@v5.0.0
+      with:
+        version: ${{ inputs.pnpm-version }}
     - name: Use Node.js ${{ inputs.node-version }}
       uses: actions/setup-node@v6
       with:

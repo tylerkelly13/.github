@@ -6,6 +6,9 @@ on:
       node-version:
         required: true
         type: string
+      pnpm-version:
+        required: true
+        type: string
 
 concurrency:
   group: deploy
@@ -16,18 +19,22 @@ jobs:
     uses: tylerkelly13/.github/.github/workflows/node-build.yml@main
     with:
       node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
   
   Linting:
     uses: tylerkelly13/.github/.github/workflows/node-lint.yml@main
     with:
       node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
 
   Formatting:
     uses: tylerkelly13/.github/.github/workflows/node-formatting.yml@main
     with:
       node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
 
   Tests:
     uses: tylerkelly13/.github/.github/workflows/node-test.yml@main
     with:
       node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}

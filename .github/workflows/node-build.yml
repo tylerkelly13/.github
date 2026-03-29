@@ -4,6 +4,9 @@ on:
       node-version:
         required: true
         type: string
+      pnpm-version:
+        required: true
+        type: string
     outputs:
       artifact-id:
         description: The ID of the uploaded artifact
@@ -18,6 +21,7 @@ jobs:
       - uses: tylerkelly13/.github/.github/actions/node-setup@main
         with: 
           node-version: ${{ inputs.node-version }}
+          pnpm-version: ${{ inputs.pnpm-version }}
       - name: Build package
         run: pnpm build
       - name: Generate Package
