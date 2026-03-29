@@ -1,0 +1,23 @@
+on:
+  workflow_call:
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+    steps:
+      - use: ./.github/actions/node/setup
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Build package
+        run: pnpm build
+      - name: Generate Package
+        run: pnpm pack --pack-destination dist
+      - name: Generate checksums
+        run: shasum -a 256 dist/*.tgz > dist/checksums/sha256.txt
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist
+          if-no-files-found: error

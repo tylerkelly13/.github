@@ -1,0 +1,12 @@
+on:
+  workflow_call:
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - use: ./.github/actions/node/setup
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Lint code
+        run: pnpm lint
