@@ -1,0 +1,27 @@
+on:
+  workflow_call:
+    inputs:
+      artifact-id:
+        required: true
+        type: string
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ inputs.artifact-id }}
+          path: artifacts
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: |
+            artifacts/*.deb
+            artifacts/checksums/*.txt
+          draft: true
+          generate_release_notes: true

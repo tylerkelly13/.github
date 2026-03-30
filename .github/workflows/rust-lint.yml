@@ -1,0 +1,10 @@
+on:
+  workflow_call:
+
+jobs:
+  Linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/cargo-cache@main
+      - name: Lint code
+        run: just clippy

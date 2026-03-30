@@ -1,0 +1,10 @@
+on:
+  workflow_call:
+
+jobs:
+  Testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/cargo-cache@main
+      - name: Run tests
+        run: just test-verbose

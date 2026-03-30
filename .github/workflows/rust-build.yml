@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: The ID of the uploaded artifact
+        value: ${{ jobs.Build.outputs.artifact-id }}
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/cargo-cache@main
+      - name: Setup vendor dependencies
+        run: just setup-rust-apt && just vendor-deps
+      - name: Build package
+        run: just build
+      - name: Generate Package
+        run: just deb --artifact-dir artifacts
+      - name: Generate checksums
+        run: |
+          mkdir -p artifacts/checksums
+          shasum -a 256 artifacts/*.deb > artifacts/checksums/sha256.txt
+      - name: Upload artifacts
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v6
+        with:
+          path: artifacts
+          if-no-files-found: error
