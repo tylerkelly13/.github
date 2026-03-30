@@ -7,4 +7,6 @@ jobs:
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
       - name: Run tests
-        run: just test-verbose
+        run: just test
+      - name: Report test coverage
+        run: just coverage

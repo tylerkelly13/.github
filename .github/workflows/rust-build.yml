@@ -12,8 +12,6 @@ jobs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
-      - name: Setup vendor dependencies
-        run: just setup-rust-apt && just vendor-deps
       - name: Build package
         run: just build
       - name: Generate Package
