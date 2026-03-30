@@ -5,6 +5,6 @@ jobs:
   Formatting:
     runs-on: ubuntu-latest
     steps:
-      - uses: tylerkelly13/.github/.github/actions/cargo-cache@main
+      - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
       - name: Check code formatting
         run: just fmt-check
