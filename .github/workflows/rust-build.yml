@@ -12,6 +12,8 @@ jobs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+      - name: Install cargo-deb
+        run: cargo install cargo-deb
       - name: Build project
         run: just build
       - name: Generate Package
