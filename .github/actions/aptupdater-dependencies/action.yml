@@ -1,0 +1,9 @@
+name: Apt Updater Debian Dependencies
+description: Updates Debian package lists and installs necessary dependencies
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libapt-pkg-dev
+      shell: bash
