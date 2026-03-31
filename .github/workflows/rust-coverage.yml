@@ -1,8 +1,14 @@
 on:
   workflow_call:
+    inputs:
+      enabled:
+        description: Whether to run coverage
+        required: true
+        type: boolean
 
 jobs:
   Coverage:
+    if: ${{ inputs.enabled }}
     runs-on: ubuntu-22.04
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main

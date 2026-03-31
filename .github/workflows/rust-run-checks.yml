@@ -2,6 +2,12 @@ name: Deploy
 
 on:
   workflow_call:
+    inputs:
+      coverage:
+        description: Whether to run coverage
+        required: false
+        default: false
+        type: boolean
     outputs:
       artifact-id:
         description: The ID of the uploaded build artifact
@@ -26,4 +32,6 @@ jobs:
 
   Coverage:
     uses: tylerkelly13/.github/.github/workflows/rust-coverage.yml@main
+    with:
+      enabled: ${{ inputs.coverage }}
 
