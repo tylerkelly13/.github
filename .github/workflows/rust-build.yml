@@ -12,17 +12,15 @@ jobs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
-      - name: Build package
-        run: just build
       - name: Generate Package
-        run: just deb --artifact-dir artifacts
+        run: just deb
       - name: Generate checksums
         run: |
-          mkdir -p artifacts/checksums
-          shasum -a 256 artifacts/*.deb > artifacts/checksums/sha256.txt
+          mkdir -p target/debian/checksums
+          shasum -a 256 target/debian/*.deb > target/debian/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
         uses: actions/upload-artifact@v6
         with:
-          path: artifacts
+          path: target/debian
           if-no-files-found: error
