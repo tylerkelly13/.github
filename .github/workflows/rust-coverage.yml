@@ -3,7 +3,7 @@ on:
 
 jobs:
   Coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
       - name: Install cargo-tarpaulin
