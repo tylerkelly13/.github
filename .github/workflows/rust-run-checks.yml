@@ -24,3 +24,6 @@ jobs:
   Tests:
     uses: tylerkelly13/.github/.github/workflows/rust-test.yml@main
 
+  Coverage:
+    uses: tylerkelly13/.github/.github/workflows/rust-coverage.yml@main
+

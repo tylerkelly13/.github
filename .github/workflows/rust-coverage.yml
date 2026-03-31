@@ -1,0 +1,12 @@
+on:
+  workflow_call:
+
+jobs:
+  Coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+      - name: Report test coverage
+        run: just coverage
