@@ -12,6 +12,10 @@ on:
         description: The ID of the uploaded artifact
         value: ${{ jobs.Build.outputs.artifact-id }}
 
+permissions:
+  contents: read
+  actions: write  # required by actions/upload-artifact
+
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -19,7 +23,7 @@ jobs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/node-setup@main
-        with: 
+        with:
           node-version: ${{ inputs.node-version }}
           pnpm-version: ${{ inputs.pnpm-version }}
       - name: Build package
@@ -29,7 +33,7 @@ jobs:
       - name: Generate checksums
         run: |
           mkdir -p artifacts/checksums
-          shasum -a 256 artifacts/*.tgz > artifacts/checksums/sha256.txt
+          sha256sum artifacts/*.tgz > artifacts/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
         uses: actions/upload-artifact@v6

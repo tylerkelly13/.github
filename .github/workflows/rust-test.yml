@@ -1,9 +1,19 @@
 on:
   workflow_call:
+    inputs:
+      container-image:
+        description: Docker image to run the job in
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   Testing:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container-image || '' }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
       - name: Run tests

@@ -1,22 +1,23 @@
 name: Cargo Setup
-description: Sets up Cargo and caches dependencies to speed up Rust builds
+description: Checks out the repository and caches Cargo dependencies
 
 runs:
   using: "composite"
   steps:
     - name: Check out repository
       uses: actions/checkout@v6
-    - name: Setup Just
-      uses: extractions/setup-just@v3
-    - uses: tylerkelly13/.github/.github/actions/aptupdater-dependencies@main
-      if: ${{ github.repository == 'tylerkelly13/aptupdatechecker' }}
+    # CARGO_HOME may differ inside containers vs standard runners
+    - name: Resolve Cargo home
+      id: cargo-home
+      run: echo "path=${CARGO_HOME:-$HOME/.cargo}" >> "$GITHUB_OUTPUT"
+      shell: bash
     - name: Cache Cargo dependencies
       uses: actions/cache@v5
       with:
         path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
+          ${{ steps.cargo-home.outputs.path }}/registry/index/
+          ${{ steps.cargo-home.outputs.path }}/registry/cache/
+          ${{ steps.cargo-home.outputs.path }}/git/db/
           target/
+          !target/debian/  # exclude built .deb packages to avoid stale binaries
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}

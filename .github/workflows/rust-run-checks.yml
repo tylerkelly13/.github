@@ -8,10 +8,19 @@ on:
         required: false
         default: false
         type: boolean
+      container-image:
+        description: Docker image to run jobs in
+        required: false
+        default: ''
+        type: string
     outputs:
       artifact-id:
         description: The ID of the uploaded build artifact
         value: ${{ jobs.Build.outputs.artifact-id }}
+
+permissions:
+  contents: read
+  actions: write  # inherited by rust-build.yml for artifact upload
 
 concurrency:
   group: deploy
@@ -20,18 +29,26 @@ concurrency:
 jobs:
   Build:
     uses: tylerkelly13/.github/.github/workflows/rust-build.yml@main
-  
+    with:
+      container-image: ${{ inputs.container-image }}
+
   Linting:
     uses: tylerkelly13/.github/.github/workflows/rust-lint.yml@main
+    with:
+      container-image: ${{ inputs.container-image }}
 
   Formatting:
     uses: tylerkelly13/.github/.github/workflows/rust-formatting.yml@main
+    with:
+      container-image: ${{ inputs.container-image }}
 
   Tests:
     uses: tylerkelly13/.github/.github/workflows/rust-test.yml@main
+    with:
+      container-image: ${{ inputs.container-image }}
 
   Coverage:
     uses: tylerkelly13/.github/.github/workflows/rust-coverage.yml@main
     with:
       enabled: ${{ inputs.coverage }}
-
+      container-image: ${{ inputs.container-image }}

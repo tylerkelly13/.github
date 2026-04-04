@@ -24,6 +24,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         cache: "pnpm"
+    # --frozen-lockfile ensures reproducible builds by failing if lockfile is outdated
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
       shell: bash

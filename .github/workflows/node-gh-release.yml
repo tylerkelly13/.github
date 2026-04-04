@@ -16,6 +16,7 @@ jobs:
           artifact-ids: ${{ inputs.artifact-id }}
           path: artifacts
 
+      # gate release creation on tag push
       - name: Release
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'

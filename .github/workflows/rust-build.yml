@@ -1,19 +1,28 @@
 on:
   workflow_call:
+    inputs:
+      container-image:
+        description: Docker image to run the job in
+        required: false
+        default: ''
+        type: string
     outputs:
       artifact-id:
         description: The ID of the uploaded artifact
         value: ${{ jobs.Build.outputs.artifact-id }}
 
+permissions:
+  contents: read
+  actions: write  # required by actions/upload-artifact
+
 jobs:
   Build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container-image || '' }}
     outputs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
-      - name: Install cargo-deb
-        run: cargo install cargo-deb
       - name: Build project
         run: just build
       - name: Generate Package
@@ -21,7 +30,7 @@ jobs:
       - name: Generate checksums
         run: |
           mkdir -p target/debian/checksums
-          shasum -a 256 target/debian/*.deb > target/debian/checksums/sha256.txt
+          sha256sum target/debian/*.deb > target/debian/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
         uses: actions/upload-artifact@v6
