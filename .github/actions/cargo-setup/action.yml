@@ -1,5 +1,11 @@
 name: Cargo Setup
-description: Checks out the repository and caches Cargo dependencies
+description: Checks out the repository, caches Cargo dependencies, and installs CI tools on bare runners
+
+inputs:
+  container-image:
+    description: Container image the job is running in (empty = bare runner)
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -21,3 +27,15 @@ runs:
           target/
           !target/debian/  # exclude built .deb packages to avoid stale binaries
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    # On bare runners, install a current stable Rust toolchain with components
+    - name: Install Rust toolchain
+      if: inputs.container-image == ''
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy, rustfmt
+    # On bare runners, install just (command runner)
+    - name: Install just
+      if: inputs.container-image == ''
+      uses: taiki-e/install-action@v2
+      with:
+        tool: just

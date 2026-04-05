@@ -16,5 +16,7 @@ jobs:
     container: ${{ inputs.container-image || '' }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+        with:
+          container-image: ${{ inputs.container-image }}
       - name: Run tests
         run: just test

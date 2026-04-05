@@ -22,5 +22,13 @@ jobs:
     container: ${{ inputs.container-image || '' }}
     steps:
       - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+        with:
+          container-image: ${{ inputs.container-image }}
+      # On bare runners, install cargo-tarpaulin for coverage reporting
+      - name: Install cargo-tarpaulin
+        if: inputs.container-image == ''
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tarpaulin
       - name: Report test coverage
         run: just coverage
