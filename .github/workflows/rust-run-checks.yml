@@ -23,7 +23,7 @@ permissions:
   actions: write  # inherited by rust-build.yml for artifact upload
 
 concurrency:
-  group: deploy
+  group: checks-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:

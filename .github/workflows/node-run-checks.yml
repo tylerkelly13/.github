@@ -15,7 +15,7 @@ on:
         value: ${{ jobs.Build.outputs.artifact-id }}
 
 concurrency:
-  group: deploy
+  group: checks-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
