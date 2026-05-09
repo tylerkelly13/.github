@@ -1,0 +1,68 @@
+name: Rust bump version
+
+on:
+  workflow_call:
+    inputs:
+      bump:
+        description: Which part of the semver to bump (major|minor|patch)
+        required: true
+        type: string
+      container-image:
+        description: Docker image to run the bump in
+        required: false
+        default: ''
+        type: string
+
+permissions: {}
+
+jobs:
+  Checks:
+    permissions:
+      contents: read
+      actions: write  # required by rust-build.yml for artifact upload
+    uses: tylerkelly13/.github/.github/workflows/rust-run-checks.yml@main
+    with:
+      container-image: ${{ inputs.container-image }}
+
+  Bump:
+    needs: [Checks]
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container-image || '' }}
+    permissions:
+      contents: write       # push the bump branch
+      pull-requests: write  # open the PR
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+        with:
+          container-image: ${{ inputs.container-image }}
+
+      - name: Configure git as github-actions[bot]
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Run bump-version script
+        id: bump
+        env:
+          BUMP_INPUT: ${{ inputs.bump }}
+        run: |
+          NEW_TAG="$(./scripts/bump-version.sh "$BUMP_INPUT" --allow-dirty | tail -n1)"
+          echo "tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_TAG: ${{ steps.bump.outputs.tag }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "bump-${NEW_TAG}" \
+            --title "chore: bump version to ${NEW_TAG}" \
+            --body "Triggered by @${ACTOR} via the bump-version workflow."
