@@ -1,0 +1,34 @@
+flowchart TD
+    subgraph orchestrator["rust-run-checks.yml (orchestrator)"]
+        direction TB
+        RB["Build\n(rust-build.yml)"]
+        RL["Linting\n(rust-lint.yml)"]
+        RF["Formatting\n(rust-formatting.yml)"]
+        RT["Tests\n(rust-test.yml)"]
+        RC["Coverage\n(rust-coverage.yml)\nif: enabled"]
+    end
+
+    subgraph build["rust-build.yml"]
+        direction TB
+        S1["cargo-setup"] --> S2["just build"]
+        S2 --> S3["just deb"]
+        S3 --> S4["sha256sum → checksums"]
+        S4 --> S5["Upload artifacts\n→ artifact-id"]
+    end
+
+    subgraph release["rust-gh-release.yml"]
+        direction TB
+        R1["Download artifact"] --> R2["GitHub Release (draft)\n*.deb + checksums"]
+    end
+
+    subgraph actions["cargo-setup (composite action)\ncheckout + cache + toolchain + just"]
+    end
+
+    RB --> build
+    orchestrator -.->|"artifact-id"| release
+
+    build -.-> actions
+    RL -.-> actions
+    RF -.-> actions
+    RT -.-> actions
+    RC -.-> actions
