@@ -11,14 +11,14 @@ runs:
   using: "composite"
   steps:
     - name: Check out repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
     # CARGO_HOME may differ inside containers vs standard runners
     - name: Resolve Cargo home
       id: cargo-home
       run: echo "path=${CARGO_HOME:-$HOME/.cargo}" >> "$GITHUB_OUTPUT"
       shell: bash
     - name: Cache Cargo dependencies
-      uses: actions/cache@v5
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5
       with:
         path: |
           ${{ steps.cargo-home.outputs.path }}/registry/index/
@@ -30,12 +30,12 @@ runs:
     # On bare runners, install a current stable Rust toolchain with components
     - name: Install Rust toolchain
       if: inputs.container-image == ''
-      uses: dtolnay/rust-toolchain@stable
+      uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8  # stable
       with:
         components: clippy, rustfmt
     # On bare runners, install just (command runner)
     - name: Install just
       if: inputs.container-image == ''
-      uses: taiki-e/install-action@v2
+      uses: taiki-e/install-action@0fd46367812ee04360509b4169d9f659d6892bb2  # v2
       with:
         tool: just

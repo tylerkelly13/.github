@@ -20,25 +20,25 @@ concurrency:
 
 jobs:
   Build:
-    uses: tylerkelly13/.github/.github/workflows/node-build.yml@main
+    uses: ./.github/workflows/node-build.yml
     with:
       node-version: ${{ inputs.node-version }}
       pnpm-version: ${{ inputs.pnpm-version }}
   
   Linting:
-    uses: tylerkelly13/.github/.github/workflows/node-lint.yml@main
+    uses: ./.github/workflows/node-lint.yml
     with:
       node-version: ${{ inputs.node-version }}
       pnpm-version: ${{ inputs.pnpm-version }}
 
   Formatting:
-    uses: tylerkelly13/.github/.github/workflows/node-formatting.yml@main
+    uses: ./.github/workflows/node-formatting.yml
     with:
       node-version: ${{ inputs.node-version }}
       pnpm-version: ${{ inputs.pnpm-version }}
 
   Tests:
-    uses: tylerkelly13/.github/.github/workflows/node-test.yml@main
+    uses: ./.github/workflows/node-test.yml
     with:
       node-version: ${{ inputs.node-version }}
       pnpm-version: ${{ inputs.pnpm-version }}

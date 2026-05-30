@@ -28,7 +28,7 @@ jobs:
       # On bare runners, install cargo-deb for Debian packaging
       - name: Install cargo-deb
         if: inputs.container-image == ''
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@0fd46367812ee04360509b4169d9f659d6892bb2  # v2
         with:
           tool: cargo-deb
       - name: Build project
@@ -41,7 +41,7 @@ jobs:
           sha256sum target/debian/*.deb > target/debian/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6
         with:
           path: target/debian
           if-no-files-found: error
