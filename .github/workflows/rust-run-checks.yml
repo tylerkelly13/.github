@@ -28,27 +28,27 @@ concurrency:
 
 jobs:
   Build:
-    uses: tylerkelly13/.github/.github/workflows/rust-build.yml@main
+    uses: ./.github/workflows/rust-build.yml
     with:
       container-image: ${{ inputs.container-image }}
 
   Linting:
-    uses: tylerkelly13/.github/.github/workflows/rust-lint.yml@main
+    uses: ./.github/workflows/rust-lint.yml
     with:
       container-image: ${{ inputs.container-image }}
 
   Formatting:
-    uses: tylerkelly13/.github/.github/workflows/rust-formatting.yml@main
+    uses: ./.github/workflows/rust-formatting.yml
     with:
       container-image: ${{ inputs.container-image }}
 
   Tests:
-    uses: tylerkelly13/.github/.github/workflows/rust-test.yml@main
+    uses: ./.github/workflows/rust-test.yml
     with:
       container-image: ${{ inputs.container-image }}
 
   Coverage:
-    uses: tylerkelly13/.github/.github/workflows/rust-coverage.yml@main
+    uses: ./.github/workflows/rust-coverage.yml
     with:
       enabled: ${{ inputs.coverage }}
       container-image: ${{ inputs.container-image }}
