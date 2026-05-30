@@ -1,0 +1,32 @@
+flowchart TD
+    subgraph orchestrator["node-run-checks.yml (orchestrator)"]
+        direction TB
+        NB["Build\n(node-build.yml)"]
+        NL["Linting\n(node-lint.yml)"]
+        NF["Formatting\n(node-formatting.yml)"]
+        NT["Tests\n(node-test.yml)"]
+    end
+
+    subgraph build["node-build.yml"]
+        direction TB
+        S1["node-setup"] --> S2["pnpm build"]
+        S2 --> S3["pnpm pack"]
+        S3 --> S4["sha256sum → checksums"]
+        S4 --> S5["Upload artifacts\n→ artifact-id"]
+    end
+
+    subgraph release["node-gh-release.yml"]
+        direction TB
+        R1["Download artifact"] --> R2["GitHub Release (draft)\n*.tgz + checksums"]
+    end
+
+    subgraph actions["node-setup (composite action)\ncheckout + pnpm + node"]
+    end
+
+    NB --> build
+    orchestrator -.->|"artifact-id"| release
+
+    build -.-> actions
+    NL -.-> actions
+    NF -.-> actions
+    NT -.-> actions
