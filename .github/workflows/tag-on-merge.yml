@@ -1,0 +1,69 @@
+name: Tag changed workflows on merge
+
+# Cuts the next <basename>-civN annotated tag for every reusable workflow or
+# composite action changed by a push to main. New units start at civ1.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+
+permissions: {}
+
+jobs:
+  Tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # create and push tags
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        with:
+          fetch-depth: 0  # need full history and all tags to compute next civ
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git as github-actions[bot]
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Cut civ tags for changed units
+        env:
+          SHA: ${{ github.sha }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+
+          base="$BEFORE"
+          if [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            base="$(git rev-parse "${SHA}^" 2>/dev/null || echo "")"
+          fi
+
+          if [ -n "$base" ]; then
+            changed="$(git diff --name-only "$base" "$SHA" -- '.github/workflows/**' '.github/actions/**')"
+          else
+            changed="$(git ls-tree -r --name-only "$SHA" -- '.github/workflows/**' '.github/actions/**')"
+          fi
+
+          units="$(
+            {
+              echo "$changed" | grep -E '^\.github/workflows/.*\.yml$' | sed -E 's#.*/##; s#\.yml$##' || true
+              echo "$changed" | grep -E '^\.github/actions/[^/]+/action\.yml$' | sed -E 's#\.github/actions/([^/]+)/action\.yml#\1#' || true
+            } | sort -u | grep -v -E '^(tag-on-merge)$' || true
+          )"
+
+          for unit in $units; do
+            [ -n "$unit" ] || continue
+            latest="$(git tag -l "${unit}-civ*" | sed -E "s/^${unit}-civ//" | grep -E '^[0-9]+$' | sort -n | tail -1 || true)"
+            next=$(( ${latest:-0} + 1 ))
+            tag="${unit}-civ${next}"
+            if git rev-parse "refs/tags/$tag" >/dev/null 2>&1; then
+              echo "Tag $tag already exists, skipping"
+              continue
+            fi
+            git tag -a "$tag" -m "$tag" "$SHA"
+            git push origin "$tag"
+            echo "Created $tag at $SHA"
+          done
