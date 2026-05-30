@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{ inputs.container-image || '' }}
     steps:
-      - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+      - uses: tylerkelly13/.github/.github/actions/cargo-setup@8d7d2e6616254a836736b88f3eb078caf96716db  # cargo-setup-civ1
         with:
           container-image: ${{ inputs.container-image }}
       - name: Run tests

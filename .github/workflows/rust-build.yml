@@ -22,7 +22,7 @@ jobs:
     outputs:
       artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
-      - uses: tylerkelly13/.github/.github/actions/cargo-setup@main
+      - uses: tylerkelly13/.github/.github/actions/cargo-setup@8d7d2e6616254a836736b88f3eb078caf96716db  # cargo-setup-civ1
         with:
           container-image: ${{ inputs.container-image }}
       # On bare runners, install cargo-deb for Debian packaging
