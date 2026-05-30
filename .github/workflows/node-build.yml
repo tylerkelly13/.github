@@ -36,7 +36,7 @@ jobs:
           sha256sum artifacts/*.tgz > artifacts/checksums/sha256.txt
       - name: Upload artifacts
         id: artifact-upload-step
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6
         with:
           path: artifacts
           if-no-files-found: error
