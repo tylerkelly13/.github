@@ -8,4 +8,4 @@ updates:
       default-days: 2
     schedule:
       interval: "cron"
-    cronjob: "0 17 * * 0"
+      cronjob: "0 17 * * 0"
