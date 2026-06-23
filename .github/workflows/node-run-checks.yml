@@ -1,4 +1,4 @@
-name: Deploy
+name: Build and Check
 
 on:
   workflow_call:
@@ -19,6 +19,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  TypeCheck:
+    uses: ./.github/workflows/node-typecheck.yml
+    with:
+      node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
+
   Build:
     uses: ./.github/workflows/node-build.yml
     with:
