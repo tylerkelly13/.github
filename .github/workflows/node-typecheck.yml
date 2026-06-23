@@ -1,0 +1,20 @@
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+      pnpm-version:
+        required: true
+        type: string
+
+jobs:
+  Testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/node-setup@8d7d2e6616254a836736b88f3eb078caf96716db  # node-setup-civ1
+        with:
+          node-version: ${{ inputs.node-version }}
+          pnpm-version: ${{ inputs.pnpm-version }}
+      - name: Run typecheck
+        run: pnpm check:types
