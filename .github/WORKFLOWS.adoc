@@ -148,15 +148,37 @@ Checks out the repository, installs pnpm, sets up Node.js with pnpm caching, and
 
 == Usage
 
-Consumer repositories reference these workflows with `workflow_call`:
+Consumer repositories reference these workflows by full commit SHA, with the civ version tag in a trailing comment:
 
 [source,yaml]
 ----
 jobs:
   Checks:
-    uses: tylerkelly13/.github/.github/workflows/rust-run-checks.yml@main
+    uses: tylerkelly13/.github/.github/workflows/rust-run-checks.yml@57b7fbaf07c295fe93485f75bcf65449b070794b  # rust-run-checks-civ2
     with:
       coverage: true
 ----
 
 See the https://docs.github.com/en/actions/sharing-automations/reusing-workflows[GitHub documentation on reusable workflows] for more details.
+
+== Versioning and pinning
+
+References are pinned for supply-chain security. The commit SHA is the control that matters; the civ tag is a readable label.
+
+Pinning rules:
+
+Consumer to reusable workflow:: Pin the full commit SHA, with the civ tag in a trailing comment, such as `...@<sha>  # rust-run-checks-civ2`. Never reference `@main` or a bare tag.
+Reusable workflow to reusable workflow (inside this repo):: Use a local relative path with no ref, such as `uses: ./.github/workflows/rust-build.yml`. A local path resolves to this repo at the commit the consumer pinned, so one consumer SHA locks the whole internal tree.
+Workflow to composite action:: Pin the full commit SHA with the civ tag in a comment. A local path does not work for a composite action when the workflow runs from another repository.
+Third-party actions:: Pin the full commit SHA with the version in a comment, such as `actions/checkout@<sha>  # v6`.
+
+Tagging:
+
+* Each reusable workflow and composite action has its own version line, named `<file-basename>-civN`, as an annotated tag. New units start at `civ1`.
+* `tag-on-merge.yml` cuts the next civ tag for every workflow or action changed by a push to `main`.
+* When a workflow's internal tree changes but its own file does not, cut a new civ for that workflow by hand so consumers can pin a version whose whole tree is locked.
+
+Updates:
+
+* The tag-protection ruleset keeps release tags (`refs/tags/v*`) immutable and signed. Civ label tags sit outside that lock so the automation can manage them.
+* Dependabot opens weekly pull requests that move the SHA and the comment together. For an urgent security fix, repin the SHA by hand.
