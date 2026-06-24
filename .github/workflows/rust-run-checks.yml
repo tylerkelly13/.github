@@ -27,11 +27,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  Build:
-    uses: ./.github/workflows/rust-build.yml
-    with:
-      container-image: ${{ inputs.container-image }}
-
   Linting:
     uses: ./.github/workflows/rust-lint.yml
     with:
@@ -42,13 +37,21 @@ jobs:
     with:
       container-image: ${{ inputs.container-image }}
 
+  Build:
+    uses: ./.github/workflows/rust-build.yml
+    needs: [Linting, Formatting]
+    with:
+      container-image: ${{ inputs.container-image }}
+
   Tests:
     uses: ./.github/workflows/rust-test.yml
+    needs: [Build]
     with:
       container-image: ${{ inputs.container-image }}
 
   Coverage:
     uses: ./.github/workflows/rust-coverage.yml
+    needs: [Tests]
     with:
       enabled: ${{ inputs.coverage }}
       container-image: ${{ inputs.container-image }}
