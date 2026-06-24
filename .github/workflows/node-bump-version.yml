@@ -1,0 +1,85 @@
+name: Node.js bump version
+
+# To use this workflow, in the repository, update
+# *Settings* -> *Actions* -> *General* -> *Workflow permissions* ->
+# *Allow GitHub Actions to create and approve pull requests*.
+on:
+  workflow_call:
+    inputs:
+      bump:
+        description: Which part of the semver to bump (major|minor|patch)
+        required: true
+        type: string
+      node-version:
+        description: Node.js version to use
+        required: true
+        type: string
+      pnpm-version:
+        description: pnpm version to use
+        required: true
+        type: string
+      ref:
+        description: Git ref to check out before bumping; defaults to the triggering branch
+        required: false
+        default: ''
+        type: string
+
+permissions: {}
+
+jobs:
+  Checks:
+    permissions:
+      contents: read
+      actions: write  # required for artifact upload in node-run-checks.yml
+    uses: ./.github/workflows/node-run-checks.yml
+    with:
+      node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
+
+  Bump:
+    needs: [Checks]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # push the bump branch
+      pull-requests: write  # open the PR
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/node-setup@55f1aaae7342cf288ac02246cad96cc4d5413ada
+        with:
+          node-version: ${{ inputs.node-version }}
+          pnpm-version: ${{ inputs.pnpm-version }}
+          ref: ${{ inputs.ref }}
+
+      - name: Configure git as github-actions[bot]
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Bump version in package.json
+        id: bump
+        env:
+          BUMP_INPUT: ${{ inputs.bump }}
+        run: |
+          pnpm version "$BUMP_INPUT" --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "tag=v${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create branch, commit, and push
+        env:
+          TAG: ${{ steps.bump.outputs.tag }}
+        run: |
+          git checkout -b "bump-${TAG}"
+          git add package.json
+          git commit -m "chore: bump version to ${TAG}"
+          git push origin "bump-${TAG}"
+
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.bump.outputs.tag }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "bump-${TAG}" \
+            --title "chore: bump version to ${TAG}" \
+            --body "Triggered by @${ACTOR} via the bump-version workflow."
