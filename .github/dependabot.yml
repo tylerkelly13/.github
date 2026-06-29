@@ -5,7 +5,12 @@ updates:
       prefix: "chore(deps): "
     directory: "/"
     cooldown:
-      default-days: 2
+      default-days: 7
     schedule:
       interval: "cron"
       cronjob: "0 17 * * 0"
+    groups:
+      dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
