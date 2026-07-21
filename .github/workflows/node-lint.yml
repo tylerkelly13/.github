@@ -54,5 +54,8 @@ jobs:
 
       - name: Validate peer dependencies against a fresh resolution
         run: |
-          rm -f pnpm-lock.yaml
+          # node-setup's own frozen install already populated node_modules; pnpm
+          # treats a matching node_modules as "up to date" and skips resolution
+          # even with pnpm-lock.yaml gone, so both have to go for a real re-resolve.
+          rm -rf node_modules pnpm-lock.yaml
           pnpm install --no-frozen-lockfile --lockfile-only --strict-peer-dependencies
