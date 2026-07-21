@@ -30,23 +30,7 @@ jobs:
       - name: Check for TypeScript 7 support in typescript-eslint
         id: ts7-check
         if: always()
-        run: |
-          RESULT=$(node --input-type=module -e '
-            import { createRequire } from "node:module";
-            const require = createRequire(import.meta.url);
-            let range = "";
-            try {
-              range = require("@typescript-eslint/typescript-estree/package.json").peerDependencies?.typescript ?? "";
-            } catch {
-              process.exit(0);
-            }
-            // crude but sufficient: an explicit upper bound at or below 7 means TS7 is still blocked
-            const upperBounds = [...range.matchAll(/<\s*(\d+)/g)].map((m) => Number(m[1]));
-            const blocksTs7 = upperBounds.length > 0 && upperBounds.every((major) => major <= 7);
-            console.log(JSON.stringify({ range, supported: !blocksTs7 }));
-          ')
-          echo "result=$RESULT" >> "$GITHUB_OUTPUT"
-          echo "$RESULT"
+        uses: tylerkelly13/.github/.github/actions/ts7-support-check@dcd2aea444b5c15f8b815200d2707897406b1b1b  # ts7-support-check-v1
 
       - name: Notify on TypeScript 7 support
         if: github.event_name == 'pull_request' && fromJson(steps.ts7-check.outputs.result || '{"supported":false}').supported == true
