@@ -37,3 +37,22 @@ jobs:
         uses: tylerkelly13/.github/.github/actions/notify-ts7-support@c328af90d2353287487e709149ca4cbd5775eb4c  # notify-ts7-support-v1
         with:
           result: ${{ steps.ts7-check.outputs.result }}
+
+  # Own job, own fresh checkout: a failed --strict-peer-dependencies run still
+  # rewrites pnpm-lock.yaml before exiting non-zero, so sharing a workspace
+  # with any other step risks a second run silently seeing the now-"clean"
+  # rewritten lockfile.
+  PeerDependencyCheck:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/node-setup@8d7d2e6616254a836736b88f3eb078caf96716db  # node-setup-civ1
+        with:
+          node-version: ${{ inputs.node-version }}
+          pnpm-version: ${{ inputs.pnpm-version }}
+
+      - name: Validate peer dependencies against a fresh resolution
+        run: |
+          rm -f pnpm-lock.yaml
+          pnpm install --no-frozen-lockfile --lockfile-only --strict-peer-dependencies
