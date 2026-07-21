@@ -1,0 +1,17 @@
+name: Check TypeScript 7 support
+description: >-
+  Checks whether typescript-eslint's peer range for `typescript` allows
+  TypeScript 7.x, so the pin from typescript-eslint/typescript-eslint#12518
+  can be revisited.
+
+outputs:
+  result:
+    description: JSON payload with `range` and `supported` fields
+    value: ${{ steps.check.outputs.result }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: check
+      shell: bash
+      run: "${{ github.action_path }}/check-ts7-support.sh"
