@@ -8,13 +8,54 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   Linting:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: tylerkelly13/.github/.github/actions/node-setup@8d7d2e6616254a836736b88f3eb078caf96716db  # node-setup-civ1
         with:
           node-version: ${{ inputs.node-version }}
           pnpm-version: ${{ inputs.pnpm-version }}
+
       - name: Lint code
         run: pnpm lint
+
+      - name: Check for TypeScript 7 support in typescript-eslint
+        id: ts7-check
+        if: always()
+        uses: tylerkelly13/.github/.github/actions/ts7-support-check@dcd2aea444b5c15f8b815200d2707897406b1b1b  # ts7-support-check-v1
+
+      - name: Notify on TypeScript 7 support
+        if: github.event_name == 'pull_request' && fromJson(steps.ts7-check.outputs.result || '{"supported":false}').supported == true
+        uses: tylerkelly13/.github/.github/actions/notify-ts7-support@c328af90d2353287487e709149ca4cbd5775eb4c  # notify-ts7-support-v1
+        with:
+          result: ${{ steps.ts7-check.outputs.result }}
+
+  # Own job, own fresh checkout: a failed --strict-peer-dependencies run still
+  # rewrites pnpm-lock.yaml before exiting non-zero, so sharing a workspace
+  # with any other step risks a second run silently seeing the now-"clean"
+  # rewritten lockfile.
+  PeerDependencyCheck:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: tylerkelly13/.github/.github/actions/node-setup@8d7d2e6616254a836736b88f3eb078caf96716db  # node-setup-civ1
+        with:
+          node-version: ${{ inputs.node-version }}
+          pnpm-version: ${{ inputs.pnpm-version }}
+
+      - name: Validate peer dependencies against a fresh resolution
+        run: |
+          # node-setup's own frozen install already populated node_modules; pnpm
+          # treats a matching node_modules as "up to date" and skips resolution
+          # even with pnpm-lock.yaml gone, so both have to go for a real re-resolve.
+          rm -rf node_modules pnpm-lock.yaml
+          pnpm install --no-frozen-lockfile --lockfile-only --strict-peer-dependencies
