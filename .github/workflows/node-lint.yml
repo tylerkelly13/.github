@@ -34,7 +34,7 @@ jobs:
 
       - name: Notify on TypeScript 7 support
         if: github.event_name == 'pull_request' && fromJson(steps.ts7-check.outputs.result || '{"supported":false}').supported == true
-        uses: tylerkelly13/.github/.github/actions/notify-ts7-support@c328af90d2353287487e709149ca4cbd5775eb4c  # notify-ts7-support-v1
+        uses: tylerkelly13/.github/.github/actions/notify-ts7-support@a0f71dfea50adc61b5f292405e98e977cf0869c5  # notify-ts7-support-civ2
         with:
           result: ${{ steps.ts7-check.outputs.result }}
 
