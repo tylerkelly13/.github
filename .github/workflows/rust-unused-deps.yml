@@ -1,0 +1,34 @@
+on:
+  workflow_call:
+    inputs:
+      fail-on-findings:
+        description: Whether findings fail the job (false reports them without failing)
+        required: false
+        default: false
+        type: boolean
+      container-image:
+        description: Docker image to run the job in
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  UnusedDependencies:
+    runs-on: ubuntu-latest
+    container: ${{ inputs.container-image || '' }}
+    steps:
+      # Not cargo-setup: cargo-machete reads source text only, so it needs no toolchain or cache.
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+      # On bare runners, install cargo-machete; container images ship it pre-installed
+      - name: Install cargo-machete
+        if: inputs.container-image == ''
+        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5  # v2
+        with:
+          tool: cargo-machete
+      - name: Find unused dependencies
+        continue-on-error: ${{ !inputs.fail-on-findings }}
+        run: cargo machete

@@ -22,6 +22,8 @@ flowchart TD
         RF["Formatting\n(rust-formatting.yml)"]
         RT["Tests\n(rust-test.yml)"]
         RC["Coverage\n(rust-coverage.yml)\nif: enabled"]
+        RA["Audit\n(rust-audit.yml)\nif: audit\ncargo deny"]
+        RU["UnusedDependencies\n(rust-unused-deps.yml)\nif: unused-dependencies\ncargo machete"]
     end
 
     subgraph build["rust-build.yml"]
@@ -54,7 +56,7 @@ flowchart TD
 === Workflow summary
 
 rust-run-checks.yml (orchestrator)::
-Composes all Rust check workflows and runs them in parallel. Accepts an optional `coverage` flag and `container-image` input. Outputs `artifact-id` from the build job. Uses concurrency control (`checks-<ref>`, cancel-in-progress).
+Composes all Rust check workflows. Accepts optional `coverage`, `audit`, and `unused-dependencies` flags and a `container-image` input. `audit` and `unused-dependencies` default to `true` and run in parallel with the other checks. Outputs `artifact-id` from the build job. Uses concurrency control (`checks-<ref>`, cancel-in-progress).
 
 rust-build.yml::
 Builds the project with `just build`, generates a `.deb` package with `just deb`, creates SHA256 checksums, and uploads all artifacts. Outputs `artifact-id`.
@@ -70,6 +72,12 @@ Runs `just test` for the test suite.
 
 rust-coverage.yml::
 Runs `just coverage` for test coverage reporting. Skips when `enabled` is `false`. Installs `cargo-tarpaulin` on bare runners.
+
+rust-audit.yml::
+Runs `cargo deny check` when the repository has a `deny.toml`, and `cargo deny check advisories` when it doesn't. Reports findings without failing unless `fail-on-findings` is `true`. Installs `cargo-deny` on bare runners. Call it directly from a scheduled workflow to catch new advisories between pull requests.
+
+rust-unused-deps.yml::
+Runs `cargo machete` to find unused dependencies. Reports findings without failing unless `fail-on-findings` is `true`. Installs `cargo-machete` on bare runners. To silence a false positive, list the crate under `[package.metadata.cargo-machete] ignored` in `Cargo.toml`.
 
 rust-gh-release.yml::
 Downloads build artifacts by ID and creates a draft GitHub release with `.deb` packages and checksums. Only creates a release on tag pushes.
@@ -157,6 +165,26 @@ jobs:
     uses: tylerkelly13/.github/.github/workflows/rust-run-checks.yml@57b7fbaf07c295fe93485f75bcf65449b070794b  # rust-run-checks-civ2
     with:
       coverage: true
+----
+
+To re-audit dependencies when no pull requests are open, call `rust-audit.yml` from a scheduled workflow. Set `fail-on-findings: true` so a finding fails the run and GitHub sends a notification:
+
+[source,yaml]
+----
+on:
+  schedule:
+    - cron: "0 17 * * 0"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  Audit:
+    permissions:
+      contents: read
+    uses: tylerkelly13/.github/.github/workflows/rust-audit.yml@<sha>  # rust-audit-civ1
+    with:
+      fail-on-findings: true
 ----
 
 See the https://docs.github.com/en/actions/sharing-automations/reusing-workflows[GitHub documentation on reusable workflows] for more details.
