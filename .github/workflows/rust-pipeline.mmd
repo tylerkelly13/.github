@@ -6,6 +6,8 @@ flowchart TD
         RF["Formatting\n(rust-formatting.yml)"]
         RT["Tests\n(rust-test.yml)"]
         RC["Coverage\n(rust-coverage.yml)\nif: enabled"]
+        RA["Audit\n(rust-audit.yml)\nif: audit\ncargo deny"]
+        RU["UnusedDependencies\n(rust-unused-deps.yml)\nif: unused-dependencies\ncargo machete"]
     end
 
     subgraph build["rust-build.yml"]

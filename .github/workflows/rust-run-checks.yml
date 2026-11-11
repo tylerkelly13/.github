@@ -8,6 +8,16 @@ on:
         required: false
         default: false
         type: boolean
+      audit:
+        description: Whether to check dependencies for advisories (and licenses, bans, and sources when deny.toml exists)
+        required: false
+        default: true
+        type: boolean
+      unused-dependencies:
+        description: Whether to check for unused dependencies
+        required: false
+        default: true
+        type: boolean
       container-image:
         description: Docker image to run jobs in
         required: false
@@ -54,4 +64,16 @@ jobs:
     needs: [Tests]
     with:
       enabled: ${{ inputs.coverage }}
+      container-image: ${{ inputs.container-image }}
+
+  Audit:
+    if: ${{ inputs.audit }}
+    uses: ./.github/workflows/rust-audit.yml
+    with:
+      container-image: ${{ inputs.container-image }}
+
+  UnusedDependencies:
+    if: ${{ inputs.unused-dependencies }}
+    uses: ./.github/workflows/rust-unused-deps.yml
+    with:
       container-image: ${{ inputs.container-image }}
